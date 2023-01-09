@@ -1,3 +1,6 @@
+# A SIMPLE SCRIPT TO TABULATE THE RSS FEED FOR APPLE DEV AND PRODUCE A SUMMARY TABLE
+# CREATED 09JAN23
+
 import feedparser
 import re
 from tabulate import tabulate
