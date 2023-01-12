@@ -1,4 +1,4 @@
-# usage: io-network.py [-h] [-a | -l | -i | -o] [-ip IP] [-ns]
+# usage: check-connections.py [-h] [-a | -l | -i | -o] [-ip IP] [-ns]
 
 # options:
 #  -h, --help       show this help message and exit
