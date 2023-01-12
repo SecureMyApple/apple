@@ -27,6 +27,7 @@ def nslookup(ip_address):
 def connection_table():
     connections = []
     columns = ["Source IP", "Source Port", "Source Interface", "", "Destination IP", "Destination Port", "Protocol", "DNS Lookup Result", "Connection State", "PID", "Program", "User"]
+    local_ips = [addr.address for iface, addrs in psutil.net_if_addrs().items() for addr in addrs if addr.family == socket.AF_INET]
     for connection in psutil.net_connections(kind='inet'):
         connection_info = []
         if connection.laddr:
@@ -62,18 +63,20 @@ def connection_table():
                 connection_info.append(None)
             connections.append(connection_info)
     dataframe = pd.DataFrame(connections,columns=columns)
+    
     if args.all:
         return dataframe
     elif args.local:
-        return dataframe.loc[(dataframe['Source IP'] == '127.0.0.1') | (dataframe['Destination IP'] == '127.0.0.1')]
+        return dataframe.loc[(dataframe['Source IP'].isin(local_ips)) | (dataframe['Destination IP'].isin(local_ips))]
     elif args.incoming:
-        return dataframe.loc[dataframe['Destination IP'] == '127.0.0.1']
+        return dataframe.loc[dataframe['Destination IP'].isin(local_ips)]
     elif args.outgoing:
-        return dataframe.loc[dataframe['Source IP'] != '127.0.0.1']
+        return dataframe.loc[~dataframe['Source IP'].isin(local_ips)]
     else:
         print("Please specify a valid argument")
         return None
 
+        
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group()
@@ -97,3 +100,4 @@ if __name__ == "__main__":
         print(tabulate(connection_df, headers='keys', tablefmt='fancy_grid'))
     else:
         parser.print_help()
+
